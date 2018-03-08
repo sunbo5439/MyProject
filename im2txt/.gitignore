@@ -7,3 +7,5 @@
 /bazel-tf
 /im2txt/.idea
 /*.pyc
+/im2txt/inception_v3.ckpt
+/im2txt/mscoco
