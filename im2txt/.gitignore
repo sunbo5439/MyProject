@@ -9,3 +9,4 @@
 /*.pyc
 /im2txt/inception_v3.ckpt
 /im2txt/mscoco
+/im2txt/model
