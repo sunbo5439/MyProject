@@ -47,6 +47,7 @@ def _train(model, data_batcher):
         sv = tf.train.Supervisor(logdir=FLAGS.log_root,
                                  is_chief=True,
                                  saver=saver,
+                                 summary_op=None,
                                  global_step=model.global_step)
         sess = sv.prepare_or_wait_for_session(config=tf.ConfigProto(allow_soft_placement=True))
         running_avg_loss = 0
@@ -60,6 +61,7 @@ def _train(model, data_batcher):
             summary_writer.add_summary(loss_summary, train_step)
             sys.stdout.write('train_step:%d  , batch_loss: %f\n' % (train_step, batch_loss))
             sys.stdout.write('step : %d' % step)
+            sys.stdout.flush()
             step += 1
             if step % 100 == 0:
                 summary_writer.flush()
