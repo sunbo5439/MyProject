@@ -18,7 +18,7 @@ PAD_ID = 0
 UNK_ID = 1
 
 HParams = namedtuple('HParams',
-                     ' batch_size,vocab_size,lr,min_lr'
+                     ' batch_size,vocab_size,lr,min_lr,'
                      'wavs_list_path,labels_vec_path,'
                      'label_max_len,wav_max_len,n_mfcc,'
                      'mode'
