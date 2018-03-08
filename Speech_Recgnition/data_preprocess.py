@@ -49,7 +49,7 @@ def load_vocab(vocab_path):
     word_num_dict = dict(zip(num_word_list, range(len(num_word_list))))
     return word_num_dict, num_word_list ,len(num_word_list)
 
-
-generation_vocab('model/labels.json','model/vocab.txt')
-word_num_dict, num_word_list = load_vocab('model/vocab.txt')
-convert_textlabel_to_idlabel('model/labels.json', 'model/labels_id.json', word_num_dict)
+if __name__ == '__main__':
+    generation_vocab('model/labels.json','model/vocab.txt')
+    word_num_dict, num_word_list = load_vocab('model/vocab.txt')
+    convert_textlabel_to_idlabel('model/labels.json', 'model/labels_id.json', word_num_dict)
