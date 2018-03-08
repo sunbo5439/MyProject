@@ -59,8 +59,7 @@ def _train(model, data_batcher):
             loss_summary = tf.Summary()
             loss_summary.value.add(tag='batch_loss', simple_value=batch_loss)
             summary_writer.add_summary(loss_summary, train_step)
-            sys.stdout.write('train_step:%d  , batch_loss: %f\n' % (train_step, batch_loss))
-            sys.stdout.write('step : %d' % step)
+            sys.stdout.write('train_step:%d  ------ cur_step:%d ---- batch_loss: %f\n' % (train_step,step, batch_loss))
             sys.stdout.flush()
             step += 1
             if step % 100 == 0:
