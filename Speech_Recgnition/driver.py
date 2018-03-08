@@ -15,14 +15,15 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('log_root', 'log_root', 'Directory for model root.')
 tf.app.flags.DEFINE_string('train_dir', 'log_root/train', 'Directory for train.')
 tf.app.flags.DEFINE_string('wavs_list_path', 'model/wav_files.json', 'json file record wav files path, list object')
-tf.app.flags.DEFINE_string('labels_vec_path', 'model/labels_id.json', 'json file record labels whith character repalced by id, 2-d list')
+tf.app.flags.DEFINE_string('labels_vec_path', 'model/labels_id.json',
+                           'json file record labels whith character repalced by id, 2-d list')
 tf.app.flags.DEFINE_string('mode', 'train', 'train , infer')
 tf.app.flags.DEFINE_string('vocab_path', 'model/vocab.txt', 'vocab path')
 tf.app.flags.DEFINE_string('wav_file_path', 'D8_999.wav', 'inpuf file, needed when infer')
 tf.app.flags.DEFINE_integer('batch_size', 16, 'batch size')
 tf.app.flags.DEFINE_float('lr', 0.01, 'learning rate')
 tf.app.flags.DEFINE_float('min_lr', 0.0005, 'min learning rate')
-tf.app.flags.DEFINE_integer('label_max_len',75 , 'max len of label(character level)')
+tf.app.flags.DEFINE_integer('label_max_len', 75, 'max len of label(character level)')
 tf.app.flags.DEFINE_integer('wav_max_len', 680, 'max length of wav mfcc feature')
 tf.app.flags.DEFINE_integer('n_mfcc', 20, 'number of MFCCs to return,')
 tf.app.flags.DEFINE_integer('max_run_steps', 1000000, 'max train step for current session')
@@ -57,7 +58,7 @@ def _train(model, data_batcher):
             loss_summary = tf.Summary()
             loss_summary.value.add(tag='batch_loss', simple_value=batch_loss)
             summary_writer.add_summary(loss_summary, train_step)
-            sys.stdout.write('train_step:%d  , batch_loss: %f\n' % train_step % batch_loss)
+            sys.stdout.write('train_step:%d  , batch_loss: %f\n' % (train_step, batch_loss))
             sys.stdout.write('step : %d' % step)
             step += 1
             if step % 100 == 0:
