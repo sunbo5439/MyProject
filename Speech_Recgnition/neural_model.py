@@ -155,7 +155,7 @@ class Model(object):
             tf.cast(tf.not_equal(tf.reduce_sum(self.X, reduction_indices=2), 0.), tf.int32),
             reduction_indices=1)
         self.loss = tf.nn.ctc_loss(target, self.logit, self.sequence_len, time_major=False)
-        self.batch_loss = tf.div(tf.reduce_sum(self.loss), hps.batch_size, name="batch_loss")
+        self.batch_loss = tf.reduce_mean(self.loss,name="batch_loss")
 
     def _add_placeholders(self):
         hps = self.hps
