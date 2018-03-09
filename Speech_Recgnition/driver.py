@@ -110,7 +110,7 @@ def main(unused_argv):
     elif hps.mode == 'infer':
         infer_hps = hps._replace(batch_size=1)
         model = neural_model.Model(hps=infer_hps)
-        _infer(model, FLAGS.wav_file_path, num_word_list,hps.wav_max_len)
+        _infer(model, FLAGS.wav_file_path, num_word_list,infer_hps)
 
 
 if __name__ == '__main__':
