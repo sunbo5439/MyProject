@@ -28,6 +28,7 @@ tf.app.flags.DEFINE_integer('wav_max_len', 680, 'max length of wav mfcc feature'
 tf.app.flags.DEFINE_integer('n_mfcc', 20, 'number of MFCCs to return,')
 tf.app.flags.DEFINE_integer('max_run_steps', 1000000, 'max train step for current session')
 
+PAD_ID = neural_model.PAD_ID
 
 def get_wav_length(wav):
     print(wav)
@@ -67,10 +68,12 @@ def _train(model, data_batcher):
         sv.Stop()
 
 
-def _infer(model, wav_file_path, num_word_list):
+def _infer(model, wav_file_path, num_word_list,hps):
     model.build_model()
     wav, sr = librosa.load(wav_file_path, mono=True)
     mfcc = np.transpose(np.expand_dims(librosa.feature.mfcc(wav, sr), axis=0), [0, 2, 1])
+    while len(mfcc) < hps.wav_max_len:
+        mfcc.append([PAD_ID] * hps.n_mfcc)
     saver = tf.train.Saver()
     sv = tf.train.Supervisor(logdir=FLAGS.log_root,
                              is_chief=True,
@@ -107,7 +110,7 @@ def main(unused_argv):
     elif hps.mode == 'infer':
         infer_hps = hps._replace(batch_size=1)
         model = neural_model.Model(hps=infer_hps)
-        _infer(model, FLAGS.wav_file_path, num_word_list)
+        _infer(model, FLAGS.wav_file_path, num_word_list,hps.wav_max_len)
 
 
 if __name__ == '__main__':
