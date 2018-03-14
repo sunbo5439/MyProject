@@ -15,7 +15,6 @@ from collections import namedtuple
 PAD = '<PAD>'
 UNK = '<UNK>'
 PAD_ID = 0
-UNK_ID = 1
 
 HParams = namedtuple('HParams',
                      ' batch_size,vocab_size,lr,min_lr,'
