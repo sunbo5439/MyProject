@@ -194,7 +194,7 @@ class Model(object):
         return sess.run(to_return, feed_dict={self.X: x_batch, self.Y: y_batch})
 
     def run_infer(self, sess, mfcc):
-        return sess.run([self.predict,self.global_step], {self.X: mfcc})
+        return sess.run([self.predict,self.global_step], feed_dict={self.X: mfcc})
 
 
 class MaxPropOptimizer(tf.train.Optimizer):
