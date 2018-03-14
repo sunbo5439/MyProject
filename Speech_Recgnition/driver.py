@@ -73,7 +73,7 @@ def _infer(model, wav_file_path, num_word_list, hps):
     model.build_model()
     wav, sr = librosa.load(wav_file_path, mono=True)
     mfcc = np.transpose(np.expand_dims(librosa.feature.mfcc(wav, sr), axis=0), [0, 2, 1])
-    pad_len = hps.wav_max_len - len(mfcc)
+    pad_len = hps.wav_max_len - len(mfcc.shape[1])
     mfcc = np.concatenate((mfcc, np.zeros((hps.batch_size, pad_len, hps.n_mfcc), dtype=int)), axis=1)
     saver = tf.train.Saver()
     sv = tf.train.Supervisor(logdir=FLAGS.log_root,
