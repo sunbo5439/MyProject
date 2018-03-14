@@ -30,6 +30,7 @@ tf.app.flags.DEFINE_integer('max_run_steps', 1000000, 'max train step for curren
 
 PAD_ID = neural_model.PAD_ID
 
+
 def get_wav_length(wav):
     print(wav)
     wav, sr = librosa.load(wav)
@@ -60,7 +61,7 @@ def _train(model, data_batcher):
             loss_summary = tf.Summary()
             loss_summary.value.add(tag='batch_loss', simple_value=batch_loss)
             summary_writer.add_summary(loss_summary, train_step)
-            sys.stdout.write('train_step:%d  ------ cur_step:%d ---- batch_loss: %f\n' % (train_step,step, batch_loss))
+            sys.stdout.write('train_step:%d  ------ cur_step:%d ---- batch_loss: %f\n' % (train_step, step, batch_loss))
             sys.stdout.flush()
             step += 1
             if step % 100 == 0:
@@ -68,13 +69,12 @@ def _train(model, data_batcher):
         sv.Stop()
 
 
-def _infer(model, wav_file_path, num_word_list,hps):
+def _infer(model, wav_file_path, num_word_list, hps):
     model.build_model()
     wav, sr = librosa.load(wav_file_path, mono=True)
     mfcc = np.transpose(np.expand_dims(librosa.feature.mfcc(wav, sr), axis=0), [0, 2, 1])
-    
-    while len(mfcc) < hps.wav_max_len:
-        mfcc.append([PAD_ID] * hps.n_mfcc)
+    pad_len = hps.wav_max_len - len(mfcc)
+    mfcc = np.concatenate((mfcc, np.zeros((hps.batch_size, pad_len, hps.n_mfcc), dtype=int)), axis=1)
     saver = tf.train.Saver()
     sv = tf.train.Supervisor(logdir=FLAGS.log_root,
                              is_chief=True,
@@ -111,7 +111,7 @@ def main(unused_argv):
     elif hps.mode == 'infer':
         infer_hps = hps._replace(batch_size=1)
         model = neural_model.Model(hps=infer_hps)
-        _infer(model, FLAGS.wav_file_path, num_word_list,infer_hps)
+        _infer(model, FLAGS.wav_file_path, num_word_list, infer_hps)
 
 
 if __name__ == '__main__':
