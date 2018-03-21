@@ -56,10 +56,11 @@ def _train(model, data_batcher):
         step = 0
         while not sv.should_stop() and step < FLAGS.max_run_steps:
             x_batch, y_batch = data_batcher.get_next_batches()
-            (_, batch_loss, train_step) = model.run_train_step(
+            (_, batch_loss, train_step, lr) = model.run_train_step(
                 sess, x_batch, y_batch)
             loss_summary = tf.Summary()
             loss_summary.value.add(tag='batch_loss', simple_value=batch_loss)
+            loss_summary.value.add(tag='learning_rate', simple_value=lr)
             summary_writer.add_summary(loss_summary, train_step)
             sys.stdout.write('train_step:%d  ------ cur_step:%d ---- batch_loss: %f\n' % (train_step, step, batch_loss))
             sys.stdout.flush()
@@ -79,6 +80,7 @@ def _infer(model, wav_file_path, num_word_list, hps):
     sv = tf.train.Supervisor(logdir=FLAGS.log_root,
                              is_chief=True,
                              saver=saver,
+                             summary_op=None,
                              global_step=model.global_step)
     sess = sv.prepare_or_wait_for_session(config=tf.ConfigProto(allow_soft_placement=True))
     predict, global_step= model.run_infer(sess=sess, mfcc=mfcc)

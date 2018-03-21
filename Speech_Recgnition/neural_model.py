@@ -166,8 +166,9 @@ class Model(object):
         hps = self.hps
         self._lr_rate = tf.maximum(
             hps.min_lr,  # min_lr_rate.
-            tf.train.exponential_decay(hps.lr, self.global_step, 30000, 0.98))
+            tf.train.exponential_decay(hps.lr, self.global_step, 3000, 0.98))
         optimizer = MaxPropOptimizer(learning_rate=self._lr_rate, beta2=0.99)
+        #tf.summary.scalar('learning rate', self._lr_rate)
         var_list = [t for t in tf.trainable_variables()]
         gradient = optimizer.compute_gradients(self.loss, var_list=var_list)
         self.optimizer_op = optimizer.apply_gradients(gradient)
@@ -187,9 +188,10 @@ class Model(object):
             self._add_train_op()
         elif self.hps.mode == 'infer':
             self._add_decode_op()
+        #self._summaries = tf.summary.merge_all()
 
     def run_train_step(self, sess, x_batch, y_batch):
-        to_return = [self.optimizer_op,  self.batch_loss, self.global_step]
+        to_return = [self.optimizer_op,  self.batch_loss, self.global_step, self._lr_rate]
         return sess.run(to_return, feed_dict={self.X: x_batch, self.Y: y_batch})
 
     def run_infer(self, sess, mfcc):
