@@ -83,13 +83,15 @@ def _infer(model, wav_file_path, num_word_list, hps):
                              summary_op=None,
                              global_step=model.global_step)
     sess = sv.prepare_or_wait_for_session(config=tf.ConfigProto(allow_soft_placement=True))
-    predict, global_step= model.run_infer(sess=sess, mfcc=mfcc)
-    print(predict.shape)
+    predict, global_step, seq_len = model.run_infer(sess=sess, mfcc=mfcc)
+    print('predict shape:', predict.shape)
+    print('seq_len.shape', seq_len.shape)
+    print(seq_len)
     to_word = lambda num: num_word_list[num]
     predict_word = [''.join(list(map(to_word, pd))) for pd in predict]
-    print('global_step : %d'%(global_step))
+    print('global_step : %d' % (global_step))
     for sentence in predict_word:
-        print sentence.replace(' ','_')
+        print sentence.replace(' ', '_')
 
 
 def main(unused_argv):

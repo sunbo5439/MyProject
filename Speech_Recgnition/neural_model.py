@@ -178,6 +178,7 @@ class Model(object):
         decoded = tf.transpose(self.logit, perm=[1, 0, 2])
         decoded, _ = tf.nn.ctc_beam_search_decoder(decoded, self.sequence_len, merge_repeated=False)
         self.predict = tf.sparse_to_dense(decoded[0].indices, decoded[0].dense_shape, decoded[0].values) + 1
+        #self.predict =  tf.sparse_to_dense(decoded[0].indices, decoded[0].shape, decoded[0].values) + 1
 
     def build_model(self):
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
@@ -195,7 +196,7 @@ class Model(object):
         return sess.run(to_return, feed_dict={self.X: x_batch, self.Y: y_batch})
 
     def run_infer(self, sess, mfcc):
-        return sess.run([self.predict,self.global_step], feed_dict={self.X: mfcc})
+        return sess.run([self.predict,self.global_step,self.sequence_len], feed_dict={self.X: mfcc})
 
 
 class MaxPropOptimizer(tf.train.Optimizer):
