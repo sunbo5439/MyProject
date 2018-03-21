@@ -86,7 +86,7 @@ def _infer(model, wav_file_path, num_word_list, hps):
     predict_word = [''.join(list(map(to_word, pd))) for pd in predict]
     print('global_step : %d'%(global_step))
     for sentence in predict_word:
-        print sentence
+        print sentence.replace(' ','_')
 
 
 def main(unused_argv):
