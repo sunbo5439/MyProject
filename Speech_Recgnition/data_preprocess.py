@@ -33,7 +33,7 @@ def convert_textlabel_to_idlabel(text_label_path, id_label_path, word_num_dict):
     for sentence in labels_text:
         sentence_ids = [word_num_dict.get(word, len(word_num_dict)) for word in sentence]
         labels_id.append(sentence_ids)
-    json.dump(labels_id, codecs.open(id_label_path, 'w', encoding='utf-8'), ensure_ascii=False)
+    json.dump(labels_id, codecs.open(id_label_path, 'w', encoding='utf-8'), ensure_ascii=False,indent=4)
 
 
 def load_vocab(vocab_path):
@@ -66,8 +66,8 @@ def split_data():
 
 
 if __name__ == '__main__':
-    split_data()
+    #split_data()
     #generation_vocab('model/labels.json', 'model/vocab.txt')
-    #word_num_dict, num_word_list, vocab_size = load_vocab('model/vocab.txt')
-    #convert_textlabel_to_idlabel('model/labels.json', 'model/labels_id.json', word_num_dict)
+    word_num_dict, num_word_list, vocab_size = load_vocab('model/vocab.txt')
+    convert_textlabel_to_idlabel('model/labels_mergetrain.json', 'model/labels_mergetrain_id.json', word_num_dict)
 
