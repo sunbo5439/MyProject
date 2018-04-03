@@ -257,9 +257,13 @@ class Batcher(object):
         for mfcc in batches_wavs:
             while len(mfcc) < self.wav_max_len:
                 mfcc.append([PAD_ID] * self.n_mfcc)
+            if(len(mfcc)>self.wav_max_len):
+                mfcc=mfcc[:self.wav_max_len]
         for label in batches_labels:
             while len(label) < self.label_max_len:
                 label.append(PAD_ID)
+            if(len(label)>self.label_max_len):
+                label=label[:self.label_max_len]
         rs_x = np.array(batches_wavs, dtype=np.float32)
         rs_y = np.array(batches_labels, dtype=np.int32)
         return rs_x, rs_y
