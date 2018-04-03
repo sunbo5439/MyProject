@@ -15,8 +15,6 @@ sys.setdefaultencoding('utf8')
 import neural_model
 
 
-
-
 def generation_vocab(label_vector_path, vocab_path):
     labels = json.load(codecs.open(label_vector_path, 'r', encoding='utf-8'))
     c = Counter()
@@ -44,9 +42,32 @@ def load_vocab(vocab_path):
         for line in f:
             num_word_list.append(line.strip('\n'))
     word_num_dict = dict(zip(num_word_list, range(len(num_word_list))))
-    return word_num_dict, num_word_list ,len(num_word_list)
+    return word_num_dict, num_word_list, len(num_word_list)
+
+
+def split_data():
+    def doit(folder_path, wav_file_list_path, label_list_path):
+        data_path = 'data_thchs30/data/'
+        wav_file_list, label_list = [], []
+        for e in os.listdir(folder_path):
+            if e.endswith('wav'):
+                f = codecs.open(os.path.join(data_path, e + '.trn'), 'r', 'utf-8')
+                label_text = f.readline().strip('\n\r\t ').replace(' ', '')
+                if len(label_text) < 2:
+                    continue
+                label_list.append(label_text)
+                wav_file_list.append(os.path.join(data_path, e))
+        json.dump(wav_file_list, codecs.open(wav_file_list_path, 'w', 'utf-8'), ensure_ascii=False, indent=4)
+        json.dump(label_list, codecs.open(label_list_path, 'w', 'utf-8'), ensure_ascii=False, indent=4)
+
+    merge_train_folder, test_folder = 'data_thchs30/merge_train', 'data_thchs30/test'
+    doit(merge_train_folder,'model/wav_mergetrain_files.json','model/labels_mergetrain.json')
+    doit(test_folder,'model/wav_test.json','model/labels_test.json')
+
 
 if __name__ == '__main__':
-    generation_vocab('model/labels.json','model/vocab.txt')
-    word_num_dict, num_word_list,vocab_size = load_vocab('model/vocab.txt')
-    convert_textlabel_to_idlabel('model/labels.json', 'model/labels_id.json', word_num_dict)
+    split_data()
+    #generation_vocab('model/labels.json', 'model/vocab.txt')
+    #word_num_dict, num_word_list, vocab_size = load_vocab('model/vocab.txt')
+    #convert_textlabel_to_idlabel('model/labels.json', 'model/labels_id.json', word_num_dict)
+

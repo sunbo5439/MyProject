@@ -50,6 +50,7 @@ def _infer_batch(model, wav_file_paths, num_word_list, hps):
                              global_step=model.global_step)
     sess = sv.prepare_or_wait_for_session(config=tf.ConfigProto(allow_soft_placement=True))
     to_word = lambda num: num_word_list[num]
+    generated_summay_list=[]
     for wav_file_path in wav_file_paths:
         wav, sr = librosa.load(wav_file_path, mono=True)
         mfcc = np.transpose(np.expand_dims(librosa.feature.mfcc(wav, sr), axis=0), [0, 2, 1])
@@ -63,6 +64,7 @@ def _infer_batch(model, wav_file_paths, num_word_list, hps):
             generated_summay += sentence.replace(' ', '')
         with codecs.open(wav_file_path+'.trngen','w',encoding='utf-8') as f:
             f.write(generated_summay)
+        generated_summay_list.append(generated_summay)
 
 def eval(label_path_list,gen_path_list):
     assert  len(label_path_list)==len(gen_path_list)
