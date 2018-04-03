@@ -110,10 +110,10 @@ def wav2text(wav_file, result_file, language='en'):
 
 #wav2text('D8_999.wav', 'tmp.txt', language='zh')
 
-test_wave_files_list = json.load(codecs.open('model/labels_test.json', 'r', 'utf-8'))
+test_wave_files_list = json.load(codecs.open('model/wav_test.json', 'r', 'utf-8'))
 baidu_labels = []
 for wav in test_wave_files_list:
-    print(wav)
+    print(wav+'-------------------')
     label = wav2text(wav, '.tmp.txt', language='zh')
     baidu_labels.append(label)
 json.dump(baidu_labels, codecs.open('model/baidu_rs.json', 'w', 'utf-8'), ensure_ascii=False, indent=4)
