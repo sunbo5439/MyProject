@@ -65,9 +65,26 @@ def split_data():
     doit(test_folder,'model/wav_test.json','model/labels_test.json')
 
 
+
+def hhh():
+    my_labels=[]
+    wavs=json.load(codecs.open('model/wav_test.json','r',encoding='utf-8'))
+    for wav in wavs:
+        name=wav.split('/')[-1]
+        newname='data_thchs30/test/'+name+'.trngen'
+        f=codecs.open(newname,'r',encoding='utf-8')
+        label=f.readline().strip('\n\r\t ')
+        my_labels.append(label)
+    json.dump(my_labels,codecs.open('model/my_test_label.json','w','utf-8'),ensure_ascii=False,indent=4)
+
+
+
+
+
+
 if __name__ == '__main__':
     #split_data()
     #generation_vocab('model/labels.json', 'model/vocab.txt')
-    word_num_dict, num_word_list, vocab_size = load_vocab('model/vocab.txt')
-    convert_textlabel_to_idlabel('model/labels_mergetrain.json', 'model/labels_mergetrain_id.json', word_num_dict)
-
+    # word_num_dict, num_word_list, vocab_size = load_vocab('model/vocab.txt')
+    # convert_textlabel_to_idlabel('model/labels_mergetrain.json', 'model/labels_mergetrain_id.json', word_num_dict)
+    hhh()

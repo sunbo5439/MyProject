@@ -6,7 +6,7 @@ import numpy as np
 import librosa
 import data_preprocess
 import codecs
-import os
+import os,json
 import Levenshtein
 
 """
@@ -69,6 +69,7 @@ def _infer_batch(model, wav_file_paths, num_word_list, hps):
         with codecs.open(wav_file_path + '.trngen', 'w', encoding='utf-8') as f:
             f.write(generated_summay)
         generated_summay_list.append(generated_summay)
+        json.dump(generated_summay_list,codecs.open('model/my_label_test.json','w',encoding='utf-8'),ensure_ascii=False,indent=4)
 
 
 def eval(label_path_list, gen_path_list):
