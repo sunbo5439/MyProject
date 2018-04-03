@@ -78,7 +78,7 @@ def _infer(model, wav_file_path, num_word_list, hps):
     if pad_len > 0:
         mfcc = np.concatenate((mfcc, np.zeros((hps.batch_size, pad_len, hps.n_mfcc), dtype=int)), axis=1)
     else:
-        mfcc = mfcc[:hps.wav_max_len:]
+        mfcc = mfcc[:, 0:hps.wav_max_len, :]
     saver = tf.train.Saver()
     sv = tf.train.Supervisor(logdir=FLAGS.log_root,
                              is_chief=True,

@@ -60,7 +60,7 @@ def _infer_batch(model, wav_file_paths, num_word_list, hps):
         if pad_len > 0:
             mfcc = np.concatenate((mfcc, np.zeros((hps.batch_size, pad_len, hps.n_mfcc), dtype=int)), axis=1)
         else:
-            mfcc = mfcc[:hps.wav_max_len:]
+            mfcc = mfcc[:, 0:hps.wav_max_len, :]
         predict, global_step, seq_len = model.run_infer(sess=sess, mfcc=mfcc)
         predict_word = [''.join(list(map(to_word, pd))) for pd in predict]
         generated_summay = ''
