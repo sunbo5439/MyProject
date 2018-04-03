@@ -105,4 +105,4 @@ def wav2text(wav_file, result_file, language='en'):
 # getSubtitle('a.mkv','0','60')
 #video2text('a.mkv', 'da.txt', 0, 120)
 
-wav2text('D8_999.wav', 'a.txt', language='cn')
+wav2text('D8_999.wav', 'a.txt', language='zh')
