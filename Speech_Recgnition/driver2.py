@@ -52,13 +52,13 @@ def _infer_batch(model, wav_file_paths, num_word_list, hps):
     to_word = lambda num: num_word_list[num]
     generated_summay_list=[]
     for wav_file_path in wav_file_paths:
+        print(wav_file_path)
         wav, sr = librosa.load(wav_file_path, mono=True)
         mfcc = np.transpose(np.expand_dims(librosa.feature.mfcc(wav, sr), axis=0), [0, 2, 1])
         pad_len = hps.wav_max_len - (mfcc.shape[1])
         mfcc = np.concatenate((mfcc, np.zeros((hps.batch_size, pad_len, hps.n_mfcc), dtype=int)), axis=1)
         predict, global_step, seq_len = model.run_infer(sess=sess, mfcc=mfcc)
         predict_word = [''.join(list(map(to_word, pd))) for pd in predict]
-        print('global_step : %d' % (global_step))
         generated_summay =''
         for sentence in predict_word:
             generated_summay += sentence.replace(' ', '')
