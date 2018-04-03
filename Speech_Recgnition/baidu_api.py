@@ -5,6 +5,7 @@ import urllib2
 import json
 import base64
 import codecs
+import pickle
 
 
 def getSubtitle(video_file_name, start_time, duration):
@@ -116,4 +117,5 @@ for wav in test_wave_files_list:
     print(wav+'-------------------')
     label = wav2text(wav, '.tmp.txt', language='zh')
     baidu_labels.append(label)
-json.dump(baidu_labels, codecs.open('model/baidu_rs.json', 'w', 'utf-8'), ensure_ascii=False, indent=4)
+pickle.dump(baidu_labels,open('baidu_labels_tmp.pkl'))
+json.dump(baidu_labels, codecs.open('model/baidu_rs.json', 'w', 'utf-8'), encoding='utf-8',ensure_ascii=False, indent=4)
