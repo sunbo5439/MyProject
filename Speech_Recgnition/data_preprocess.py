@@ -79,17 +79,13 @@ def hhh():
 
 
 def eval(label_path_list_path, gen_path_list_path):
-    label_path_list = json.load(codecs.open(label_path_list_path, 'r', 'utf-8'))
-    gen_path_list = json.load(codecs.open(gen_path_list_path, 'r', 'utf-8'))
-    assert len(label_path_list) == len(gen_path_list)
+    label_list = json.load(codecs.open(label_path_list_path, 'r', 'utf-8'))
+    gen_list = json.load(codecs.open(gen_path_list_path, 'r', 'utf-8'))
+    assert len(label_list) == len(gen_list)
     total_distance, total_len = 0, 0
-    for i in range(len(label_path_list)):
-        lf = codecs.open(label_path_list[i], 'r', 'utf-8')
-        gf = codecs.open(gen_path_list[i], 'r', 'utf-8')
-        s1 = lf.readline()
-        s2 = gf.readline()
-        lf.close()
-        gf.close()
+    for i in range(len(label_list)):
+        s1 = label_list[i]
+        s2 = gen_list[i]
         total_distance += Levenshtein.distance(s1, s2)
         total_len += len(s1)
     print("CER:%f" % (total_distance * 1.8 / total_len))
