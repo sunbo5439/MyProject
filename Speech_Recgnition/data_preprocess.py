@@ -8,6 +8,7 @@ import codecs
 import pickle
 import json
 import sys
+import Levenshtein
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -33,7 +34,7 @@ def convert_textlabel_to_idlabel(text_label_path, id_label_path, word_num_dict):
     for sentence in labels_text:
         sentence_ids = [word_num_dict.get(word, len(word_num_dict)) for word in sentence]
         labels_id.append(sentence_ids)
-    json.dump(labels_id, codecs.open(id_label_path, 'w', encoding='utf-8'), ensure_ascii=False,indent=4)
+    json.dump(labels_id, codecs.open(id_label_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
 
 
 def load_vocab(vocab_path):
@@ -61,30 +62,42 @@ def split_data():
         json.dump(label_list, codecs.open(label_list_path, 'w', 'utf-8'), ensure_ascii=False, indent=4)
 
     merge_train_folder, test_folder = 'data_thchs30/merge_train', 'data_thchs30/test'
-    doit(merge_train_folder,'model/wav_mergetrain_files.json','model/labels_mergetrain.json')
-    doit(test_folder,'model/wav_test.json','model/labels_test.json')
-
+    doit(merge_train_folder, 'model/wav_mergetrain_files.json', 'model/labels_mergetrain.json')
+    doit(test_folder, 'model/wav_test.json', 'model/labels_test.json')
 
 
 def hhh():
-    my_labels=[]
-    wavs=json.load(codecs.open('model/wav_test.json','r',encoding='utf-8'))
+    my_labels = []
+    wavs = json.load(codecs.open('model/wav_test.json', 'r', encoding='utf-8'))
     for wav in wavs:
-        name=wav.split('/')[-1]
-        newname='data_thchs30/test/'+name+'.trngen'
-        f=codecs.open(newname,'r',encoding='utf-8')
-        label=f.readline().strip('\n\r\t ')
+        name = wav.split('/')[-1]
+        newname = 'data_thchs30/test/' + name + '.trngen'
+        f = codecs.open(newname, 'r', encoding='utf-8')
+        label = f.readline().strip('\n\r\t ')
         my_labels.append(label)
-    json.dump(my_labels,codecs.open('model/my_test_label.json','w','utf-8'),ensure_ascii=False,indent=4)
+    json.dump(my_labels, codecs.open('model/my_test_label.json', 'w', 'utf-8'), ensure_ascii=False, indent=4)
 
 
-
-
+def eval(label_path_list_path, gen_path_list_path):
+    label_path_list = json.load(codecs.open(label_path_list_path, 'r', 'utf-8'))
+    gen_path_list = json.load(codecs.open(gen_path_list_path, 'r', 'utf-8'))
+    assert len(label_path_list) == len(gen_path_list)
+    total_distance, total_len = 0, 0
+    for i in range(len(label_path_list)):
+        lf = codecs.open(label_path_list[i], 'r', 'utf-8')
+        gf = codecs.open(gen_path_list[i], 'r', 'utf-8')
+        s1 = lf.readline()
+        s2 = gf.readline()
+        lf.close()
+        gf.close()
+        total_distance += Levenshtein.distance(s1, s2)
+        total_len += len(s1)
+    print("CER:%f" % (total_distance * 1.8 / total_len))
 
 
 if __name__ == '__main__':
-    #split_data()
-    #generation_vocab('model/labels.json', 'model/vocab.txt')
+    # split_data()
+    # generation_vocab('model/labels.json', 'model/vocab.txt')
     # word_num_dict, num_word_list, vocab_size = load_vocab('model/vocab.txt')
     # convert_textlabel_to_idlabel('model/labels_mergetrain.json', 'model/labels_mergetrain_id.json', word_num_dict)
-    hhh()
+    eval('model/labels_test.json','model/my_test_label.json')

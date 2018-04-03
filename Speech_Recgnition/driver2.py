@@ -72,19 +72,7 @@ def _infer_batch(model, wav_file_paths, num_word_list, hps):
         json.dump(generated_summay_list,codecs.open('model/my_label_test.json','w',encoding='utf-8'),ensure_ascii=False,indent=4)
 
 
-def eval(label_path_list, gen_path_list):
-    assert len(label_path_list) == len(gen_path_list)
-    total_distance, total_len = 0, 0
-    for i in range(len(label_path_list)):
-        lf = codecs.open(label_path_list[i], 'r', 'utf-8')
-        gf = codecs.open(gen_path_list[i], 'r', 'utf-8')
-        s1 = lf.readline()
-        s2 = gf.readline()
-        lf.close()
-        gf.close()
-        total_distance += Levenshtein.distance(s1, s2)
-        total_len += len(s1)
-    print("CER:%f" % (total_distance * 1.8 / total_len))
+
 
 
 def main(unused_argv):
