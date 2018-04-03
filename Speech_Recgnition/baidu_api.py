@@ -93,7 +93,7 @@ def wav2text(wav_file, result_file, language='en'):
 
     t = urllib2.urlopen(req).read()
     result = json.loads(t)
-    print(result)
+    #print(result)
     text_rs = ''
     if result['err_msg'] == 'success.':
         text_rs = result['result'][0].encode('utf-8')
@@ -108,7 +108,7 @@ def wav2text(wav_file, result_file, language='en'):
 # getSubtitle('a.mkv','0','60')
 # video2text('a.mkv', 'da.txt', 0, 120)
 
-wav2text('D8_999.wav', 'tmp.txt', language='zh')
+#wav2text('D8_999.wav', 'tmp.txt', language='zh')
 
 test_wave_files_list = json.load(codecs.open('model/labels_test.json', 'r', 'utf-8'))
 baidu_labels = []
