@@ -88,7 +88,7 @@ def eval(label_path_list_path, gen_path_list_path):
         s2 = gen_list[i]
         total_distance += Levenshtein.distance(s1, s2)
         total_len += len(s1)
-    print("CER:%f" % (total_distance * 1.8 / total_len))
+    print("CER:%f" % (total_distance * 1.0 / total_len))
 
 
 if __name__ == '__main__':
