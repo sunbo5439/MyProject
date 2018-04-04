@@ -15,8 +15,8 @@ infer:  python driver.py --mode=infer --wav_file_path=D8_999.wav
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('log_root', 'log_root', 'Directory for model root.')
 tf.app.flags.DEFINE_string('train_dir', 'log_root/train', 'Directory for train.')
-tf.app.flags.DEFINE_string('wavs_list_path', 'model/wav_files.json', 'json file record wav files path, list object')
-tf.app.flags.DEFINE_string('labels_vec_path', 'model/labels_id.json',
+tf.app.flags.DEFINE_string('wavs_list_path', 'model/wav_mergetrain_files.json', 'json file record wav files path, list object')
+tf.app.flags.DEFINE_string('labels_vec_path', 'model/labels_mergetrain_id.json',
                            'json file record labels whith character repalced by id, 2-d list')
 tf.app.flags.DEFINE_string('mode', 'train', 'train , infer')
 tf.app.flags.DEFINE_string('vocab_path', 'model/vocab.txt', 'vocab path')

@@ -144,6 +144,7 @@ class Model(object):
 
         # 最后卷积层输出是词汇表大小
         self.logit = self.conv1d_layer(logit, size=1, dim=hp.vocab_size, activation=None, scale=0.04, bias=True)
+        pass
 
     def _add_loss(self):
         hps = self.hps
