@@ -124,7 +124,7 @@ baidu_labels = []
 f=codecs.open('log_baidu','r',encoding='utf-8')
 lines=f.readlines()
 for i in range(1,len(lines),2):
-    line=lines[i].strip('\n\r\t ').replace('，','')
+    line=lines[i].strip('\n\r\t ').replace(u'，','')
     baidu_labels.append(line)
 json.dump(baidu_labels, codecs.open('model/baidu_rs.json', 'w', 'utf-8'), encoding='utf-8',ensure_ascii=False, indent=4)
 
