@@ -112,12 +112,19 @@ def wav2text(wav_file, result_file, language='en'):
 # b= wav2text('data_thchs30/data/D31_906.wav', 'tmp.txt', language='zh')
 # a.append(b)
 
-test_wave_files_list = json.load(codecs.open('model/wav_test.json', 'r', 'utf-8'))
+#test_wave_files_list = json.load(codecs.open('model/wav_test.json', 'r', 'utf-8'))
 baidu_labels = []
-for wav in test_wave_files_list:
-    print(wav+'-------------------')
-    label = wav2text(wav, '.tmp.txt', language='zh')
-    print(label)
-    baidu_labels.append(label)
-pickle.dump(baidu_labels,open('baidu_labels_tmp.pkl'))
+# for wav in test_wave_files_list:
+#     print(wav+'-------------------')
+#     label = wav2text(wav, '.tmp.txt', language='zh')
+#     print(label)
+#     baidu_labels.append(label)
+# pickle.dump(baidu_labels,open('baidu_labels_tmp.pkl','w'))
+# json.dump(baidu_labels, codecs.open('model/baidu_rs.json', 'w', 'utf-8'), encoding='utf-8',ensure_ascii=False, indent=4)
+f=codecs.open('log_baidu','r',encoding='utf-8')
+lines=f.readlines()
+for i in range(1,len(lines),2):
+    line=lines[i].strip('\n\r\t ').replace('，','')
+    baidu_labels.append(line)
 json.dump(baidu_labels, codecs.open('model/baidu_rs.json', 'w', 'utf-8'), encoding='utf-8',ensure_ascii=False, indent=4)
+
