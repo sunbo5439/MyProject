@@ -108,8 +108,9 @@ def wav2text(wav_file, result_file, language='en'):
 
 # getSubtitle('a.mkv','0','60')
 # video2text('a.mkv', 'da.txt', 0, 120)
-
-wav2text('data_thchs30/data/D31_906.wav', 'tmp.txt', language='zh')
+a=[]
+b= wav2text('data_thchs30/data/D31_906.wav', 'tmp.txt', language='zh')
+a.append(b)
 
 # test_wave_files_list = json.load(codecs.open('model/wav_test.json', 'r', 'utf-8'))
 # baidu_labels = []
