@@ -97,3 +97,4 @@ if __name__ == '__main__':
     # word_num_dict, num_word_list, vocab_size = load_vocab('model/vocab.txt')
     # convert_textlabel_to_idlabel('model/labels_mergetrain.json', 'model/labels_mergetrain_id.json', word_num_dict)
     eval('model/labels_test.json','model/my_test_label.json')
+    eval('model/labels_test.json', 'model/baidu_rs.json')
