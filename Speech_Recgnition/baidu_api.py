@@ -108,15 +108,16 @@ def wav2text(wav_file, result_file, language='en'):
 
 # getSubtitle('a.mkv','0','60')
 # video2text('a.mkv', 'da.txt', 0, 120)
-a=[]
-b= wav2text('data_thchs30/data/D31_906.wav', 'tmp.txt', language='zh')
-a.append(b)
+# a=[]
+# b= wav2text('data_thchs30/data/D31_906.wav', 'tmp.txt', language='zh')
+# a.append(b)
 
-# test_wave_files_list = json.load(codecs.open('model/wav_test.json', 'r', 'utf-8'))
-# baidu_labels = []
-# for wav in test_wave_files_list:
-#     print(wav+'-------------------')
-#     label = wav2text(wav, '.tmp.txt', language='zh')
-#     baidu_labels.append(label)
-# pickle.dump(baidu_labels,open('baidu_labels_tmp.pkl'))
-# json.dump(baidu_labels, codecs.open('model/baidu_rs.json', 'w', 'utf-8'), encoding='utf-8',ensure_ascii=False, indent=4)
+test_wave_files_list = json.load(codecs.open('model/wav_test.json', 'r', 'utf-8'))
+baidu_labels = []
+for wav in test_wave_files_list:
+    print(wav+'-------------------')
+    label = wav2text(wav, '.tmp.txt', language='zh')
+    print(label)
+    baidu_labels.append(label)
+pickle.dump(baidu_labels,open('baidu_labels_tmp.pkl'))
+json.dump(baidu_labels, codecs.open('model/baidu_rs.json', 'w', 'utf-8'), encoding='utf-8',ensure_ascii=False, indent=4)
