@@ -73,6 +73,11 @@ class MyTranslator:
 
 
 t = MyTranslator()
-rs = t.translate_sentence('a person riding a surf board on a wave')  #一个人骑在上面冲浪板波
-print(rs)
+ss=[
+    'a bird is perched on a tree branch',
+    'an elephant standing in the middle of a field'
+]
+for s in ss:
+    rs = t.translate_sentence(s)  #一个人骑在上面冲浪板波
+    print(rs)
 print('\nend\n')
