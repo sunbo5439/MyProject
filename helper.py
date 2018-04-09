@@ -114,4 +114,8 @@ def _generation_vocab():
     sf.close()
     df.close()
 
-_generation_vocab()
+#_generation_vocab()
+
+s='\\u672c\\u6587'
+print s.decode('unicode_escape')
+
