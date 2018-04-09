@@ -124,8 +124,6 @@ class Batcher(object):
             target_batch[i, :] = targets[:]
             for j in xrange(dec_output_len):
                 loss_weights[i][j] = 1
-            print('----------------------------------batcher')
-            print(enc_batch)
         return (enc_batch, dec_batch, target_batch, enc_input_lens, dec_output_lens,
                 loss_weights, origin_articles, origin_abstracts)
 
