@@ -47,6 +47,7 @@ class Vocab(object):
                 pieces = line.split()
                 if len(pieces) != 2:
                     sys.stderr.write('Bad line: %s\n' % line)
+                    print(line)
                     continue
                 if pieces[0] in self._word_to_id:
                     raise ValueError('Duplicated word: %s.' % pieces[0])
