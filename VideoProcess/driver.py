@@ -38,28 +38,42 @@ def process(json_folder):
     json.dump(path_desc_list, codecs.open('path_desc.json', 'w', 'utf-8'), ensure_ascii=False, indent=4)
     return path_desc_list
 
+
 def rename():
     path_desc_list = json.load(codecs.open('path_desc.json', 'r', 'utf-8'))
-    new_path_desc_list=[]
+    new_path_desc_list = []
     for i in range(len(path_desc_list)):
-        old_path,desc= path_desc_list[i]
-        old_path='/home/derc/sunbo/video/'+old_path.split('/')[-1]
+        old_path, desc = path_desc_list[i]
+        old_path = '/home/derc/sunbo/video/' + old_path.split('/')[-1]
         if not os.path.exists(old_path):
             continue
-        new_path='/home/derc/sunbo/video/'+str(i)+'.wmv'
-        new_path_desc_list.append([new_path,desc])
-        #os.rename(old_path,new_path)
+        new_path = '/home/derc/sunbo/video/' + str(i) + '.wmv'
+        new_path_desc_list.append([new_path, desc])
+        # os.rename(old_path,new_path)
     json.dump(new_path_desc_list, codecs.open('path_desc_new.json', 'w', 'utf-8'), ensure_ascii=False, indent=4)
+
 
 def rename2():
     root_folder = '/home/derc/sunbo/video'
-    for name in  os.listdir(root_folder):
+    for name in os.listdir(root_folder):
         if not name.endswith('wav'):
             continue
-        index=int(name.split('.')[0])
-        new_name="%03d" %(index)+'.wmv'
-        new_path=os.path.join(root_folder,new_name)
-        os.rename(os.path.join(root_folder,name),new_path)
+        index = int(name.split('.')[0])
+        new_name = "%03d" % (index) + '.wmv'
+        new_path = os.path.join(root_folder, new_name)
+        os.rename(os.path.join(root_folder, name), new_path)
 
-#process('data')
-rename2()
+
+def rename3():
+    path_desc_list = json.load(codecs.open('path_desc_new.json', 'r', 'utf-8'))
+    for i in range(len(path_desc_list)):
+        old_path = path_desc_list[i][0]
+        folder_name, base_name = os.path.split(old_path)
+        index = int(base_name.split('.')[0])
+        new_path=os.path.join(folder_name,"%03d" % (index) + '.wmv')
+        path_desc_list[i][0] = new_path
+    json.dump(path_desc_list, codecs.open('path_desc_new.json', 'w', 'utf-8'), ensure_ascii=False, indent=4)
+
+
+# process('data')
+rename3()
