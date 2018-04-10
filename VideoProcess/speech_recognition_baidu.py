@@ -24,7 +24,7 @@ def getSubtitle(video_file_name, start_time, duration):
     os.system(cmd)
 
 
-def video2text(video_file_name, text_file_name, start_time, duration):
+def video2text(video_file_name,  start_time, duration):
     """
     use the baidu speech recognition api to translate the radio to text
     Parameters
