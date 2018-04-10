@@ -128,7 +128,7 @@ class Model(object):
         #self._summaries = tf.summary.merge_all()
 
     def run_train_step(self, sess, x_batch, y_batch):
-        to_return = [self.optimizer_op,  self.batch_loss, self.global_step, self._lr_rate]
+        to_return = [self._train_op,self.batch_loss, self.global_step, self._lr_rate]
         return sess.run(to_return, feed_dict={self.X: x_batch, self.Y: y_batch})
 
     def run_infer(self, sess, mfcc):

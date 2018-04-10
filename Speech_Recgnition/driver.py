@@ -27,7 +27,7 @@ tf.app.flags.DEFINE_integer('batch_size', 16, 'batch size')
 tf.app.flags.DEFINE_float('lr', 0.001, 'learning rate')
 tf.app.flags.DEFINE_float('min_lr', 0.0005, 'min learning rate')
 tf.app.flags.DEFINE_integer('label_max_len', 75, 'max len of label(character level)')
-tf.app.flags.DEFINE_integer('wav_max_len', 680, 'max length of wav mfcc feature')
+tf.app.flags.DEFINE_integer('wav_max_len', 720, 'max length of wav mfcc feature')
 tf.app.flags.DEFINE_integer('n_mfcc', 20, 'number of MFCCs to return,')
 tf.app.flags.DEFINE_integer('max_run_steps', 1000000, 'max train step for current session')
 
@@ -146,7 +146,7 @@ def main(unused_argv):
         min_lr=FLAGS.min_lr,
         lr=FLAGS.lr,
         mode=mode,
-        max_grad_norm=2,
+        max_grad_norm=25,
     )
 
     if FLAGS.mode == 'train':
