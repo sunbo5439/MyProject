@@ -52,14 +52,14 @@ def rename():
     json.dump(new_path_desc_list, codecs.open('path_desc_new.json', 'w', 'utf-8'), ensure_ascii=False, indent=4)
 
 def rename2():
-    root_folder = '/home/derc/sunbo/video/'
+    root_folder = '/home/derc/sunbo/video'
     for name in  os.listdir(root_folder):
         if not name.endswith('wav'):
             continue
         index=int(name.split('.')[0])
         new_name="%03d" %(index)+'.wmv'
         new_path=os.path.join(root_folder,new_name)
-        os.rename(os.path.join(root_folder,name,new_path))
+        os.rename(os.path.join(root_folder,name),new_path)
 
 #process('data')
 rename2()
