@@ -105,9 +105,7 @@ class Model(object):
         optimizer = tf.train.GradientDescentOptimizer(self._lr_rate)
         tvars = tf.trainable_variables()
         grads, global_norm = tf.clip_by_global_norm(
-            tf.gradients(self._loss, tvars), hps.max_grad_norm)
-        # tf.summary.scalar('global_norm', global_norm)
-        # tf.summary.scalar('learning rate', self._lr_rate)
+            tf.gradients(self.loss, tvars), hps.max_grad_norm)
         self._train_op = optimizer.apply_gradients(
             zip(grads, tvars), global_step=self.global_step, name='train_step')
 
