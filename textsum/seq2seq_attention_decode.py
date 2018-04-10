@@ -48,14 +48,16 @@ class DecodeIO(object):
             os.mkdir(self._outdir)
         self._ref_file = None
         self._decode_file = None
+        self._text_file = None
 
-    def Write(self, reference, decode):
+    def Write(self, text, reference, decode):
         """Writes the reference and decoded outputs to RKV files.
 
         Args:
           reference: The human (correct) result.
           decode: The machine-generated result
         """
+        self._text_file.write('text=%s\n' % text)
         self._ref_file.write('output=%s\n' % reference)
         self._decode_file.write('output=%s\n' % decode)
         self._cnt += 1
@@ -67,11 +69,14 @@ class DecodeIO(object):
         """Resets the output files. Must be called once before Write()."""
         if self._ref_file: self._ref_file.close()
         if self._decode_file: self._decode_file.close()
+        if self._text_file: self._text_file.close()
         timestamp = int(time.time())
         self._ref_file = codecs.open(
             os.path.join(self._outdir, 'ref%d' % timestamp), 'w', 'utf-8')
         self._decode_file = codecs.open(
             os.path.join(self._outdir, 'decode%d' % timestamp), 'w', 'utf-8')
+        self._text_file = codecs.open(
+            os.path.join(self._outdir, 'text%d' % timestamp), 'w', 'utf-8')
 
 
 class BSDecoder(object):
@@ -160,4 +165,5 @@ class BSDecoder(object):
         tf.logging.info('article:  %s', article)
         tf.logging.info('abstract: %s', abstract)
         tf.logging.info('decoded:  %s', decoded_output)
-        self._decode_io.Write(abstract, decoded_output.strip())
+        self._decode_io.Write(article.decode('unicode_escape'), abstract.decode('unicode_escape'),
+                              decoded_output.strip())
