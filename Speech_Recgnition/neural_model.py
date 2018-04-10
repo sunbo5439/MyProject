@@ -20,7 +20,7 @@ HParams = namedtuple('HParams',
                      ' batch_size,vocab_size,lr,min_lr,'
                      'wavs_list_path,labels_vec_path,'
                      'label_max_len,wav_max_len,n_mfcc,'
-                     'mode'
+                     'mode,max_grad_norm'
                      )
 
 
@@ -32,119 +32,53 @@ class Model(object):
         self.logit = None
         self.loss = None
 
-    def conv1d_layer(self, input_tensor, size, dim, activation, scale, bias):
-        with tf.variable_scope("conv1d_" + str(self.conv1d_index)):
-            W = tf.get_variable('W', (size, input_tensor.get_shape().as_list()[-1], dim), dtype=tf.float32,
-                                initializer=tf.random_uniform_initializer(minval=-scale, maxval=scale))
-            if bias:
-                b = tf.get_variable('b', [dim], dtype=tf.float32, initializer=tf.constant_initializer(0))
-            out = tf.nn.conv1d(input_tensor, W, stride=1, padding='SAME') + (b if bias else 0)
-
-            if not bias:
-                beta = tf.get_variable('beta', dim, dtype=tf.float32, initializer=tf.constant_initializer(0))
-                gamma = tf.get_variable('gamma', dim, dtype=tf.float32, initializer=tf.constant_initializer(1))
-                mean_running = tf.get_variable('mean', dim, dtype=tf.float32,
-                                               initializer=tf.constant_initializer(0))
-                variance_running = tf.get_variable('variance', dim, dtype=tf.float32,
-                                                   initializer=tf.constant_initializer(1))
-                mean, variance = tf.nn.moments(out, axes=list(range(len(out.get_shape()) - 1)))
-
-                def update_running_stat():
-                    decay = 0.99
-
-                    # 定义了均值方差指数衰减 见 http://blog.csdn.net/liyuan123zhouhui/article/details/70698264
-                    update_op = [mean_running.assign(mean_running * decay + mean * (1 - decay)),
-                                 variance_running.assign(variance_running * decay + variance * (1 - decay))]
-
-                    # 指定先执行均值方差的更新运算 见 http://blog.csdn.net/u012436149/article/details/72084744
-                    with tf.control_dependencies(update_op):
-                        return tf.identity(mean), tf.identity(variance)
-
-                        # 条件运算(https://applenob.github.io/tf_9.html) 按照作者这里的指定 是不进行指数衰减的
-
-                m, v = tf.cond(tf.Variable(False, trainable=False), update_running_stat,
-                               lambda: (mean_running, variance_running))
-                out = tf.nn.batch_normalization(out, m, v, beta, gamma, 1e-8)
-
-            if activation == 'tanh':
-                out = tf.nn.tanh(out)
-            elif activation == 'sigmoid':
-                out = tf.nn.sigmoid(out)
-
-            self.conv1d_index += 1
-            return out
-
-            # 极黑卷积层 https://www.zhihu.com/question/57414498
-
-    def aconv1d_layer(self, input_tensor, size, rate, activation, scale, bias):
-        with tf.variable_scope('aconv1d_' + str(self.aconv1d_index)):
-            shape = input_tensor.get_shape().as_list()
-
-            # 利用 2 维极黑卷积函数计算相应 1 维卷积，expand_dims squeeze做了相应维度处理
-            # 实际 上一个 tf.nn.conv1d 在之前的tensorflow版本中是没有的，其的一个实现也是经过维度调整后调用 tf.nn.conv2d
-            W = tf.get_variable('W', (1, size, shape[-1], shape[-1]), dtype=tf.float32,
-                                initializer=tf.random_uniform_initializer(minval=-scale, maxval=scale))
-            if bias:
-                b = tf.get_variable('b', [shape[-1]], dtype=tf.float32, initializer=tf.constant_initializer(0))
-            out = tf.nn.atrous_conv2d(tf.expand_dims(input_tensor, dim=1), W, rate=rate, padding='SAME')
-            out = tf.squeeze(out, [1])
-
-            if not bias:
-                beta = tf.get_variable('beta', shape[-1], dtype=tf.float32, initializer=tf.constant_initializer(0))
-                gamma = tf.get_variable('gamma', shape[-1], dtype=tf.float32,
-                                        initializer=tf.constant_initializer(1))
-                mean_running = tf.get_variable('mean', shape[-1], dtype=tf.float32,
-                                               initializer=tf.constant_initializer(0))
-                variance_running = tf.get_variable('variance', shape[-1], dtype=tf.float32,
-                                                   initializer=tf.constant_initializer(1))
-                mean, variance = tf.nn.moments(out, axes=list(range(len(out.get_shape()) - 1)))
-
-                def update_running_stat():
-                    decay = 0.99
-                    update_op = [mean_running.assign(mean_running * decay + mean * (1 - decay)),
-                                 variance_running.assign(variance_running * decay + variance * (1 - decay))]
-                    with tf.control_dependencies(update_op):
-                        return tf.identity(mean), tf.identity(variance)
-
-                m, v = tf.cond(tf.Variable(False, trainable=False), update_running_stat,
-                               lambda: (mean_running, variance_running))
-                out = tf.nn.batch_normalization(out, m, v, beta, gamma, 1e-8)
-
-            if activation == 'tanh':
-                out = tf.nn.tanh(out)
-            elif activation == 'sigmoid':
-                out = tf.nn.sigmoid(out)
-
-            self.aconv1d_index += 1
-            return out
-
-    def _build_neural_layer(self, n_dim=128, n_blocks=3):
+    def _build_neural_layer(self, n_dim=128, GRU_hidden_size=128):
         hp = self.hps
-        out = self.conv1d_layer(input_tensor=self.X, size=1, dim=n_dim, activation='tanh', scale=0.14, bias=False)
 
-        def residual_block(input_sensor, size, rate):
-            conv_filter = self.aconv1d_layer(input_tensor=input_sensor, size=size, rate=rate, activation='tanh',
-                                             scale=0.03,
-                                             bias=False)
-            conv_gate = self.aconv1d_layer(input_tensor=input_sensor, size=size, rate=rate, activation='sigmoid',
-                                           scale=0.03,
-                                           bias=False)
-            out = conv_filter * conv_gate
-            out = self.conv1d_layer(out, size=1, dim=n_dim, activation='tanh', scale=0.08, bias=False)
-            return out + input_sensor, out
+        #第一个卷积层
+        kernal_1 = tf.get_variable('keranl_1', (3, hp.n_mfcc, n_dim), dtype=tf.float32,initializer=tf.random_uniform_initializer(minval=-0.15, maxval=0.15))
+        b_1 = tf.get_variable('b_1', [n_dim], dtype=tf.float32, initializer=tf.constant_initializer(0.0))
+        conv_1=tf.nn.conv1d(self.X,kernal_1,stride=1,padding='SAME')
+        pre_activation_1 = tf.nn.bias_add(conv_1, b_1)
+        cnn_1 = tf.nn.relu(pre_activation_1)
 
-        skip = 0
-        for _ in range(n_blocks):
-            for r in [1, 2, 4, 8, 16]:
-                out, s = residual_block(out, size=7, rate=r)
-                skip += s
+        #第二个卷积层
+        kernal_2 = tf.get_variable('keranl_2', (5, n_dim, n_dim), dtype=tf.float32,
+                                   initializer=tf.random_uniform_initializer(minval=-0.15, maxval=0.15))
+        b_2 = tf.get_variable('b_2', [n_dim], dtype=tf.float32, initializer=tf.constant_initializer(0.0))
+        conv_2 = tf.nn.conv1d(cnn_1, kernal_2, stride=1, padding='SAME')
+        pre_activation_2 = tf.nn.bias_add(conv_2, b_2)
+        cnn_2 = tf.nn.relu(pre_activation_2)
 
-        logit = self.conv1d_layer(skip, size=1, dim=skip.get_shape().as_list()[-1], activation='tanh', scale=0.08,
-                                  bias=False)
+        #max_pooling
+        out=cnn_2
+        #三个GRU
+        num_steps = cnn_2.shape.as_list()[-2]
+        W = tf.Variable(tf.zeros([GRU_hidden_size, hp.vocab_size]))  # 构建一个变量，代表权重矩阵，初始化为0
+        b = tf.Variable(tf.zeros([hp.vocab_size]))  # 构建一个变量，代表偏置，初始化为0
+        def make_cell():
+            return tf.contrib.rnn.GRUCell(GRU_hidden_size)
+        cell = tf.contrib.rnn.MultiRNNCell(
+            [make_cell() for _ in range(3)], state_is_tuple=True)
 
+        self._initial_state = cell.zero_state(hp.batch_size, dtype=tf.float32)
+        state = self._initial_state
+
+        gru_outputs = []
+        with tf.variable_scope("GRU"):
+            for time_step in range(num_steps):
+                if time_step > 0: tf.get_variable_scope().reuse_variables()
+                (cell_output, state) = cell(cnn_2[:, time_step, :], state)
+                #cell_output 做全连接 16，128--> 16,vocabsize 在做softmax(这儿没问题，
+                # https://docs.scipy.org/doc/numpy-dev/reference/generated/numpy.matmul.html#numpy.matmul
+                softmax = tf.nn.softmax(tf.matmul(cell_output, W) + b)
+                gru_outputs.append(softmax)
+        #output = tf.reshape(gru_outputs, [hp.batch_size, ,])
+        #gru_outputs.shape=(wav_max_len,batch_size,n_dim) (680,16,128)
         # 最后卷积层输出是词汇表大小
-        self.logit = self.conv1d_layer(logit, size=1, dim=hp.vocab_size, activation=None, scale=0.04, bias=True)
-        pass
+        # 经过转置换后变成 (16,680,2882)
+        self.logit=tf.transpose(gru_outputs, perm=[1, 0, 2])
+
 
     def _add_loss(self):
         hps = self.hps
@@ -168,12 +102,15 @@ class Model(object):
         self._lr_rate = tf.maximum(
             hps.min_lr,  # min_lr_rate.
             tf.train.exponential_decay(hps.lr, self.global_step, 3000, 0.98))
-        optimizer = MaxPropOptimizer(learning_rate=self._lr_rate, beta2=0.99)
-        #tf.summary.scalar('learning rate', self._lr_rate)
-        var_list = [t for t in tf.trainable_variables()]
-        gradient = optimizer.compute_gradients(self.loss, var_list=var_list)
-        self.optimizer_op = optimizer.apply_gradients(gradient)
-        self.global_step = self.global_step.assign_add(1)
+        optimizer = tf.train.GradientDescentOptimizer(self._lr_rate)
+        tvars = tf.trainable_variables()
+        grads, global_norm = tf.clip_by_global_norm(
+            tf.gradients(self._loss, tvars), hps.max_grad_norm)
+        # tf.summary.scalar('global_norm', global_norm)
+        # tf.summary.scalar('learning rate', self._lr_rate)
+        self._train_op = optimizer.apply_gradients(
+            zip(grads, tvars), global_step=self.global_step, name='train_step')
+
 
     def _add_decode_op(self):
         decoded = tf.transpose(self.logit, perm=[1, 0, 2])
@@ -199,38 +136,6 @@ class Model(object):
     def run_infer(self, sess, mfcc):
         return sess.run([self.predict,self.global_step,self.sequence_len], feed_dict={self.X: mfcc})
 
-
-class MaxPropOptimizer(tf.train.Optimizer):
-    def __init__(self, learning_rate=0.001, beta2=0.999, use_locking=False, name="MaxProp"):
-        super(MaxPropOptimizer, self).__init__(use_locking, name)
-        self._lr = learning_rate
-        self._beta2 = beta2
-        self._lr_t = None
-        self._beta2_t = None
-
-    def _prepare(self):
-        self._lr_t = tf.convert_to_tensor(self._lr, name="learning_rate")
-        self._beta2_t = tf.convert_to_tensor(self._beta2, name="beta2")
-
-    def _create_slots(self, var_list):
-        for v in var_list:
-            self._zeros_slot(v, "m", self._name)
-
-    def _apply_dense(self, grad, var):
-        lr_t = tf.cast(self._lr_t, var.dtype.base_dtype)
-        beta2_t = tf.cast(self._beta2_t, var.dtype.base_dtype)
-        if var.dtype.base_dtype == tf.float16:
-            eps = 1e-7
-        else:
-            eps = 1e-8
-        m = self.get_slot(var, "m")
-        m_t = m.assign(tf.maximum(beta2_t * m + eps, tf.abs(grad)))
-        g_t = grad / m_t
-        var_update = tf.assign_sub(var, lr_t * g_t)
-        return tf.group(*[var_update, m_t])
-
-    def _apply_sparse(self, grad, var):
-        return self._apply_dense(grad, var)
 
 
 class Batcher(object):

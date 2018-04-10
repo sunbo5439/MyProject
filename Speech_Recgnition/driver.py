@@ -5,7 +5,7 @@ import sys
 import numpy as np
 import librosa
 import data_preprocess
-import codecs,json
+import codecs, json
 
 """
 train:  python driver.py
@@ -15,10 +15,11 @@ infer:  python driver.py --mode=infer --wav_file_path=D8_999.wav
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('log_root', 'log_root', 'Directory for model root.')
 tf.app.flags.DEFINE_string('train_dir', 'log_root/train', 'Directory for train.')
-tf.app.flags.DEFINE_string('wavs_list_path', 'model/wav_mergetrain_files.json', 'json file record wav files path, list object')
+tf.app.flags.DEFINE_string('wavs_list_path', 'model/wav_mergetrain_files.json',
+                           'json file record wav files path, list object')
 tf.app.flags.DEFINE_string('labels_vec_path', 'model/labels_mergetrain_id.json',
                            'json file record labels whith character repalced by id, 2-d list')
-tf.app.flags.DEFINE_string('mode', 'train', 'train , infer')
+tf.app.flags.DEFINE_string('mode', 'train', 'train , infer,batch_inder')
 tf.app.flags.DEFINE_string('vocab_path', 'model/vocab.txt', 'vocab path')
 tf.app.flags.DEFINE_string('wav_file_path', 'D8_999.wav', 'inpuf file, needed when infer')
 tf.app.flags.DEFINE_string('wav_test_paths', 'model/wav_test.json', '')
@@ -98,7 +99,8 @@ def _infer(model, wav_file_path, num_word_list, hps):
     for sentence in predict_word:
         print sentence.replace(' ', '_')
 
-def _infer_batch(model, wav_file_paths, num_word_list,result_path, hps):
+
+def _infer_batch(model, wav_file_paths, num_word_list, result_path, hps):
     model.build_model()
     saver = tf.train.Saver()
     sv = tf.train.Supervisor(logdir=FLAGS.log_root,
@@ -124,11 +126,15 @@ def _infer_batch(model, wav_file_paths, num_word_list,result_path, hps):
         for sentence in predict_word:
             generated_summay += sentence.replace(' ', '')
         generated_summay_list.append(generated_summay)
-        json.dump(generated_summay_list,codecs.open(result_path,'w',encoding='utf-8'),ensure_ascii=False,indent=4)
+        json.dump(generated_summay_list, codecs.open(result_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
+
 
 def main(unused_argv):
     # get wav_max_len first
     word_num_dict, num_word_list, vocab_size = data_preprocess.load_vocab(FLAGS.vocab_path)
+    mode = FLAGS.mode
+    if mode == 'batch_infer':
+        mode = 'infer'
     hps = neural_model.HParams(
         wavs_list_path=FLAGS.wavs_list_path,
         labels_vec_path=FLAGS.labels_vec_path,
@@ -138,8 +144,9 @@ def main(unused_argv):
         vocab_size=vocab_size,
         n_mfcc=FLAGS.n_mfcc,
         min_lr=FLAGS.min_lr,
-        mode=FLAGS.mode,
         lr=FLAGS.lr,
+        mode=mode,
+        max_grad_norm=2,
     )
 
     if FLAGS.mode == 'train':
@@ -153,8 +160,8 @@ def main(unused_argv):
     elif FLAGS.mode == 'batch_infer':
         infer_hps = hps._replace(batch_size=1)
         model = neural_model.Model(hps=infer_hps)
-        wav_file_paths = json.load(codecs.open(FLAGS.wav_test_paths,'r','utf-8'))
-        _infer_batch(wav_file_paths,num_word_list,'model/my_test_label.json',infer_hps)
+        wav_file_paths = json.load(codecs.open(FLAGS.wav_test_paths, 'r', 'utf-8'))
+        _infer_batch(wav_file_paths, num_word_list, 'model/my_test_label.json', infer_hps)
 
 
 if __name__ == '__main__':
