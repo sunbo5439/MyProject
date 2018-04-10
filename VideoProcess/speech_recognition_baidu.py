@@ -24,7 +24,7 @@ def getSubtitle(video_file_name, start_time, duration):
     os.system(cmd)
 
 
-def video2text(video_file_name,  start_time, duration):
+def video2text(video_file_name, start_time, duration):
     """
     use the baidu speech recognition api to translate the radio to text
     Parameters
@@ -44,6 +44,9 @@ def video2text(video_file_name,  start_time, duration):
     extracmp3_cmd = 'ffmpeg -ss ' + str(start_time) + ' -t ' + str(
         duration) + ' -i ' + input_file + ' -loglevel error -q:a 0 -map 0:a -ar 16000 -acodec mp3 ' + mp3_name
     convert2wav_cmd = 'ffmpeg -i ' + mp3_name + ' -loglevel error -ar 16000  -ac 1 -q:a 2 ' + wav_name
+
+    print('extracmp3_cmd: %s' % (extracmp3_cmd))
+    print('convert2wav_cmd: %s' % (convert2wav_cmd))
     cutcmd = 'ffmpeg -i %s -loglevel error -ss %s -t %s ' + tempwav
     os.system(extracmp3_cmd)
     os.system(convert2wav_cmd)
@@ -105,7 +108,7 @@ def wav2text(wav_file, language='en'):
 
 
 # getSubtitle('a.mkv','0','60')
-#video2text('data/sunbo_test.mp4', 'da.txt', 0, 400)
+# video2text('data/sunbo_test.mp4', 'da.txt', 0, 400)
 
 path_desc_file = 'path_desc_new.json'
 path_desc_voice_file = 'path_desc_voice.json'
