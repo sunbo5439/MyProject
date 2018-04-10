@@ -146,7 +146,7 @@ def main(unused_argv):
         min_lr=FLAGS.min_lr,
         lr=FLAGS.lr,
         mode=mode,
-        max_grad_norm=25,
+        max_grad_norm=2,
     )
 
     if FLAGS.mode == 'train':
