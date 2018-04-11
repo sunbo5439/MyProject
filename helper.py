@@ -5,6 +5,7 @@ import jieba
 import pickle
 import os
 import json
+import eyed3
 
 video_folder = ''
 
@@ -50,6 +51,26 @@ def convert_mp3_2_wav(video_items_path, wav_folder):
     json.dump(video_items, codecs.open(video_items_path, 'w', 'utf-8'), ensure_ascii=False, indent=4)
 
 
-extract_keyframe('VideoProcess/video_item.json', '/home/derc/sunbo/keyframe', 20)
-extract_mp3('VideoProcess/video_item.json', '/home/derc/sunbo/mp3')
+def convert_mp3_2_shortwav(video_items_path, shortwav_folder):
+    step_seconds = 50
+    video_items = json.load(codecs.open(video_items_path, 'r', 'utf-8'))
+    cut_cmd = 'ffmpeg -i %s  -loglevel error -ss %s -t %s -ar 16000  -ac 1 -q:a 2 %s'
+    for item in video_items:
+        mp3_path = item['mp3_path']
+        wav_basename = os.path.basename(mp3_path).split('.')[0]
+        duration = int(eyed3.load(mp3_path).info.time_secs)
+        short_wav_list = []
+        for start in xrange(0, duration, step_seconds):
+            wav_path = os.path.join(shortwav_folder, wav_basename + '_%04d.wav' % (start / step_seconds))
+            short_wav_list.append(wav_path)
+            tmp_cmd = cut_cmd % (mp3_path, str(start), str(step_seconds + 1), wav_path)
+            print(tmp_cmd)
+            os.system(tmp_cmd)
+        item['shortwav_path'] = short_wav_list
+    json.dump(video_items, codecs.open(video_items_path, 'w', 'utf-8'), ensure_ascii=False, indent=4)
+
+
+# extract_keyframe('VideoProcess/video_item.json', '/home/derc/sunbo/keyframe', 20)
+# extract_mp3('VideoProcess/video_item.json', '/home/derc/sunbo/mp3')
 # convert_mp3_2_wav('VideoProcess/path_desc_voice.json','/home/derc/sunbo/wav')
+convert_mp3_2_shortwav('VideoProcess/video_item.json', '/home/derc/sunbo/shortwav')
