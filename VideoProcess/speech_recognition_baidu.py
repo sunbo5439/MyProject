@@ -115,13 +115,15 @@ path_desc_voice_file = 'path_desc_voice.json'
 path_desc_list = json.load(codecs.open(path_desc_file, 'r', 'utf-8'))
 path_desc_voice_list = []
 for i in range(len(path_desc_list)):
+    #for i in range(2):
     video_path = path_desc_list[i][0]
     ref_text = path_desc_list[i][1]
     voice_text = ''
-    tmp_d = {id: i, 'video_path': video_path, 'ref_text': ref_text, 'voice_text': voice_text}
+    tmp_d = {'id': i, 'video_path': video_path, 'ref_text': ref_text, 'voice_text': voice_text}
     try:
-        tmp_d['voice_text'] =video2text(video_path, 0, 10000000)
+        #tmp_d['voice_text'] =video2text(video_path, 0, 10000000)
+        tmp_d['voice_text'] = ''
     except:
         continue
     path_desc_voice_list.append(tmp_d)
-json.dump(codecs.open(path_desc_voice_file, 'w', 'utf-8'), ensure_ascii=False, indent=4)
+json.dump(path_desc_voice_list,codecs.open(path_desc_voice_file, 'w', 'utf-8'), ensure_ascii=False, indent=4)

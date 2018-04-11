@@ -29,9 +29,9 @@ def averageP(key, doc_list):
         context = doc_list[i]['voice_text']
         ref = doc_list[i]['ref_text']
         if key in context:
-            hit_count += 1
+            total_count += 1
             if key in ref:
-                total_count += 1
+                hit_count += 1
     return total_count, hit_count
 
 
@@ -43,6 +43,8 @@ def cal_AP(key_list, doc_list):
         hit_count += cur_hit_count
     ap = hit_count * 1.0 / total_count
 
+def cal_Fscore(p,r):
+    return 2*p*r/(p+r)
 
 keys = [
     '北京', '北京大学',
