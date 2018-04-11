@@ -62,7 +62,7 @@ def video2text(video_file_name, start_time, duration):
     return voice_text
 
 
-def wav2text(wav_file, language='en'):
+def wav2text(wav_file, language='zh'):
     baidu_server = "https://openapi.baidu.com/oauth/2.0/token?"
     grant_type = "client_credentials"
     client_id = "RMOy9Uw1TwND2WzrUeyDH66G"  # 填写API Key
