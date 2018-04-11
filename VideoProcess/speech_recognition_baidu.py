@@ -111,7 +111,7 @@ def wav2text(wav_file, language='en'):
 # video2text('data/sunbo_test.mp4', 'da.txt', 0, 400)
 
 path_desc_file = 'path_desc_new.json'
-path_desc_voice_file = 'path_desc_voice.json'
+path_desc_voice_file = 'video_item.json'
 path_desc_list = json.load(codecs.open(path_desc_file, 'r', 'utf-8'))
 path_desc_voice_list = []
 for i in range(len(path_desc_list)):
