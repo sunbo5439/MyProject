@@ -21,6 +21,13 @@ from __future__ import print_function
 import math
 import os
 import json, codecs
+import httplib
+import md5
+import urllib
+import random
+import json
+import codecs
+import traceback
 
 import tensorflow as tf
 
@@ -42,6 +49,69 @@ tf.flags.DEFINE_string("video_items_path", "",
 tf.logging.set_verbosity(tf.logging.INFO)
 
 
+class MyTranslator:
+    appid_list = [
+        ('20180108000113096', '6SoGftc65GEs3GcQSRi7'),  #
+        ('20170226000039912', 'BwxN9UzG3yZbRQcJvc7d'),
+        ('20180118000116684', 'J0Drvmy9UGcNwNMrDvYK'),
+        ('20180118000116674', 'r1mbw_SKVsE5GLnntHXC'),
+        ('20180117000115894', '8ebrPfFOUVtZFxQYcUGr'),
+        ('20180116000115825', 'LGFk8C3pgW8GBvyG5MrS'),
+        ('20180116000115792', '0UKEgR4FvUJdBXfs4XDi'),
+        ('20180116000115768', 'PiJ0xQZgGN7nZSws0kmb'),
+        ('20180116000115765', 'PP5PEGQx34y8wBuYlmvs'),
+        ('20180116000115610', '_dSZB6V4NkvTzQPlAWKZ'),  # 有可能有问题
+        ('20180110000113705', 'hOsZSKq1Ya2vPJwBK6wN'),
+        ('20180109000113451', '25Yc0E58yOOxIQFONkcO'),  #
+        ('20180108000113078', '1fPb7llXqa8EtwppFJMN'),  #
+        ('20180108000113073', 'oujj9BU1yWEEsdSMwrei'),  #
+        ('20180108000113068', 'SLFbMGFTx2AvGT9U1bM6'),  #
+        ('20180108000113070', 'iUi9qyZcsoO10SjGKOE5'),
+
+    ]
+    appid_index = 0
+
+    def geturl(self, sentence):
+        q = sentence
+        appid = self.appid_list[self.appid_index][0]
+        secretKey = self.appid_list[self.appid_index][1]
+        fromLang = 'en'
+        toLang = 'zh'
+        salt = random.randint(32768, 65536)
+        myurl = '/api/trans/vip/translate'
+        sign = appid + q + str(salt) + secretKey
+        m1 = md5.new()
+        m1.update(sign)
+        sign = m1.hexdigest()
+        myurl = myurl + '?appid=' + appid + '&q=' + urllib.quote(
+            q) + '&from=' + fromLang + '&to=' + toLang + '&salt=' + str(salt) + '&sign=' + sign
+        return myurl
+
+    def translate_sentence(self, sentence):
+        rs = ''
+        try:
+            httpClient = httplib.HTTPConnection('api.fanyi.baidu.com')
+            myurl = self.geturl(sentence)
+            httpClient.request('GET', myurl)
+            # response是HTTPResponse对象
+            response = httpClient.getresponse()
+            obj = json.loads(response.read(), encoding='utf-8')
+            trans_rs = obj['trans_result']
+            if len(trans_rs) == 1:
+                rs = trans_rs[0]['dst']
+            else:
+                for e in trans_rs:
+                    rs += e['dst'] + ' '
+        except Exception, e:
+            print
+            e, sentence
+            traceback.print_exc()
+        finally:
+            if httpClient:
+                httpClient.close()
+            return rs
+
+
 def main(_):
     # Build the inference graph.
     g = tf.Graph()
@@ -60,8 +130,7 @@ def main(_):
     tf.logging.info("Running caption generation on %d files matching %s",
                     len(filenames), FLAGS.input_files)
 
-
-
+    t = MyTranslator()
 
     with tf.Session(graph=g) as sess:
         # Load the model from checkpoint.
@@ -75,25 +144,27 @@ def main(_):
         video_items_path = FLAGS.video_items_path
         video_items = json.load(codecs.open(video_items_path, 'r', 'utf-8'))
         for item in video_items:
-            keyframes=item['keyframes']
-            keyframe_desc=''
+            keyframes = item['keyframes']
+            keyframe_desc_en = ''
+            keyframe_desc_cn = ''
             for filename in keyframes:
                 with tf.gfile.GFile(filename, "r") as f:
                     image = f.read()
                 captions = generator.beam_search(sess, image)
                 print("Captions for image %s:" % os.path.basename(filename))
-                tmp_list=[]
+                tmp_list_en = []
+                tmp_list_cn = []
                 for i, caption in enumerate(captions):
                     # Ignore begin and end words.
                     sentence = [vocab.id_to_word(w) for w in caption.sentence[1:-1]]
                     sentence = " ".join(sentence)
-                    tmp_list.append(sentence)
-                if len(tmp_list)>0:
-                    keyframe_desc+=tmp_list
-            item['keyframe_desc']=keyframe_desc
+                    tmp_list_en.append(sentence)
+                if len(tmp_list_en) > 0:
+                    keyframe_desc_en += tmp_list_en[0]
+                    keyframe_desc_cn += t.translate_sentence(tmp_list_en[0])
+            item['keyframe_desc_en'] = keyframe_desc_en
+            item['keyframe_desc_en'] = keyframe_desc_cn
         json.dump(video_items, codecs.open(video_items_path, 'w', 'utf-8'), ensure_ascii=False, indent=4)
-
-
 
 
 if __name__ == "__main__":
