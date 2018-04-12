@@ -125,7 +125,7 @@ def speech_recognition_baidu(video_items_path, shortwav_folder):
     for item in video_items:
         speech_text = ''
         shortwav_path = item['shortwav_path']
-        for wav_path in shortwav_folder:
+        for wav_path in shortwav_path:
             try:
                 speech_text += wav2text(wav_path)
             except:
