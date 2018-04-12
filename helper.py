@@ -11,6 +11,13 @@ import eyed3
 import urllib2
 import json
 import base64
+import sys
+
+try:
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+except:
+    pass
 
 video_folder = ''
 
@@ -126,7 +133,7 @@ def speech_recognition_baidu(video_items_path, shortwav_folder):
     for item in video_items:
         speech_text = ''
         shortwav_path = item['shortwav_path']
-        shortwav_path = shortwav_path[:4]
+        shortwav_path = shortwav_path[:2]
         for wav_path in shortwav_path:
             try:
                 speech_text += wav2text(wav_path)
@@ -141,3 +148,6 @@ def speech_recognition_baidu(video_items_path, shortwav_folder):
 # convert_mp3_2_wav('VideoProcess/path_desc_voice.json','/home/derc/sunbo/wav')
 # convert_mp3_2_shortwav('VideoProcess/video_item2.json', '/home/derc/sunbo/shortwav')
 speech_recognition_baidu('VideoProcess/video_item2.json', '/home/derc/sunbo/shortwav')
+
+
+print('done')
