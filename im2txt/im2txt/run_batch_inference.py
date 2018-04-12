@@ -125,7 +125,6 @@ def main(_):
     # Create the vocabulary.
     vocab = vocabulary.Vocabulary(FLAGS.vocab_file)
 
-
     t = MyTranslator()
 
     with tf.Session(graph=g) as sess:
@@ -154,6 +153,7 @@ def main(_):
                     # Ignore begin and end words.
                     sentence = [vocab.id_to_word(w) for w in caption.sentence[1:-1]]
                     sentence = " ".join(sentence)
+                    print("  %d) %s (p=%f)" % (i, sentence, math.exp(caption.logprob)))
                     tmp_list_en.append(sentence)
                 if len(tmp_list_en) > 0:
                     keyframe_desc_en += tmp_list_en[0]
