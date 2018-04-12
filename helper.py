@@ -122,6 +122,7 @@ def convert_mp3_2_shortwav(video_items_path, shortwav_folder):
 
 def speech_recognition_baidu(video_items_path, shortwav_folder):
     video_items = json.load(codecs.open(video_items_path, 'r', 'utf-8'))
+    video_items = video_items[:2]
     for item in video_items:
         speech_text = ''
         shortwav_path = item['shortwav_path']
@@ -137,4 +138,5 @@ def speech_recognition_baidu(video_items_path, shortwav_folder):
 # extract_keyframe('VideoProcess/video_item.json', '/home/derc/sunbo/keyframe', 20)
 # extract_mp3('VideoProcess/video_item.json', '/home/derc/sunbo/mp3')
 # convert_mp3_2_wav('VideoProcess/path_desc_voice.json','/home/derc/sunbo/wav')
-convert_mp3_2_shortwav('VideoProcess/video_item.json', '/home/derc/sunbo/shortwav')
+# convert_mp3_2_shortwav('VideoProcess/video_item2.json', '/home/derc/sunbo/shortwav')
+speech_recognition_baidu('VideoProcess/video_item2.json', '/home/derc/sunbo/shortwav')
