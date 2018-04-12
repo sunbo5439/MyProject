@@ -51,7 +51,7 @@ def wav2text(wav_file, language='zh'):
 
     t = urllib2.urlopen(req).read()
     result = json.loads(t)
-    print(result)
+    # print(result)
     word = ''
     if result['err_msg'] == 'success.':
         word = result['result'][0].encode('utf-8')
@@ -122,17 +122,18 @@ def convert_mp3_2_shortwav(video_items_path, shortwav_folder):
 
 def speech_recognition_baidu(video_items_path, shortwav_folder):
     video_items = json.load(codecs.open(video_items_path, 'r', 'utf-8'))
-    video_items = video_items[:2]
+    video_items = video_items[:1]
     for item in video_items:
         speech_text = ''
         shortwav_path = item['shortwav_path']
+        shortwav_path = shortwav_path[:4]
         for wav_path in shortwav_path:
             try:
                 speech_text += wav2text(wav_path)
             except:
                 continue
         item['voice_text'] = speech_text
-    json.dump(video_items, codecs.open(video_items_path, 'w', 'utf-8'), ensure_ascii=False, indent=4)
+    json.dump(video_items, codecs.open(video_items_path, 'w', 'utf-8'), encoding='utf-8', ensure_ascii=False, indent=4)
 
 
 # extract_keyframe('VideoProcess/video_item.json', '/home/derc/sunbo/keyframe', 20)
