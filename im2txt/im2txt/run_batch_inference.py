@@ -138,11 +138,15 @@ def main(_):
 
         video_items_path = FLAGS.video_items_path
         video_items = json.load(codecs.open(video_items_path, 'r', 'utf-8'))
+        root_path='/home/dl/sunbo/MyProject/im2txt/keyframe'
         for item in video_items:
             keyframes = item['keyframes']
             keyframe_desc_en = ''
             keyframe_desc_cn = ''
-            for filename in keyframes:
+            for f_path in keyframes:
+                base_name=os.path.basename(f_path)
+                filename=os.path.join(root_path,base_name)
+
                 with tf.gfile.GFile(filename, "r") as f:
                     image = f.read()
                 captions = generator.beam_search(sess, image)
