@@ -125,11 +125,6 @@ def main(_):
     # Create the vocabulary.
     vocab = vocabulary.Vocabulary(FLAGS.vocab_file)
 
-    filenames = []
-    for file_pattern in FLAGS.input_files.split(","):
-        filenames.extend(tf.gfile.Glob(file_pattern))
-    tf.logging.info("Running caption generation on %d files matching %s",
-                    len(filenames), FLAGS.input_files)
 
     t = MyTranslator()
 
