@@ -163,7 +163,7 @@ def main(_):
                     keyframe_desc_en += tmp_list_en[0]
                     keyframe_desc_cn += t.translate_sentence(tmp_list_en[0])
             item['keyframe_desc_en'] = keyframe_desc_en
-            item['keyframe_desc_en'] = keyframe_desc_cn
+            item['keyframe_desc_cn'] = keyframe_desc_cn
         json.dump(video_items, codecs.open(video_items_path, 'w', 'utf-8'), ensure_ascii=False, indent=4)
 
 
