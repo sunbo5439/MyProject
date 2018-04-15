@@ -12,6 +12,7 @@ import urllib2
 import json
 import base64
 import sys
+import traceback
 
 try:
     reload(sys)
@@ -134,11 +135,15 @@ def speech_recognition_baidu(video_items_path, shortwav_folder):
     for item in video_items:
         speech_text = ''
         shortwav_path = item['shortwav_path']
-        print('%d of %d , file path : %s' % (cur, total, shortwav_path))
+        print('%d of %d' % (cur, total))
+        cur+=1
         for wav_path in shortwav_path:
+            print('\t\t'+wav_path)
             try:
                 speech_text += wav2text(wav_path)
             except:
+                print
+                traceback.print_exc()
                 continue
         item['voice_text'] = speech_text
     json.dump(video_items, codecs.open(video_items_path, 'w', 'utf-8'), encoding='utf-8', ensure_ascii=False, indent=4)
