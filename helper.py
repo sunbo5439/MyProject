@@ -128,17 +128,18 @@ def convert_mp3_2_shortwav(video_items_path, shortwav_folder):
     json.dump(video_items, codecs.open(video_items_path, 'w', 'utf-8'), ensure_ascii=False, indent=4)
 
 
-def speech_recognition_baidu(video_items_path, shortwav_folder):
+def speech_recognition_baidu(video_items_path, video_items_path_new, shortwav_folder):
     video_items = json.load(codecs.open(video_items_path, 'r', 'utf-8'))
-    # video_items = video_items[:1]
     total, cur = (len(video_items)), 1
     for item in video_items:
         speech_text = ''
+        if item.has_key('voice_text') and len(item['voice_text']) > 0:
+            continue
         shortwav_path = item['shortwav_path']
         sys.stdout.write('%d of %d\n' % (cur, total))
-        cur+=1
+        cur += 1
         for wav_path in shortwav_path:
-            sys.stdout.write('\t\t'+wav_path+'\n')
+            sys.stdout.write('\t\t' + wav_path + '\n')
             sys.stdout.flush()
             try:
                 speech_text += wav2text(wav_path)
@@ -147,13 +148,15 @@ def speech_recognition_baidu(video_items_path, shortwav_folder):
                 traceback.print_exc()
                 continue
         item['voice_text'] = speech_text
-    json.dump(video_items, codecs.open(video_items_path, 'w', 'utf-8'), encoding='utf-8', ensure_ascii=False, indent=4)
+        json.dump(video_items, codecs.open(video_items_path_new, 'w', 'utf-8'), encoding='utf-8', ensure_ascii=False,
+                  indent=4)
 
 
 # extract_keyframe('VideoProcess/video_item_keyframe.json', '/home/derc/sunbo/keyframe', 40)
 # extract_mp3('VideoProcess/video_item.json', '/home/derc/sunbo/mp3')
 # convert_mp3_2_wav('VideoProcess/path_desc_voice.json','/home/derc/sunbo/wav')
 # convert_mp3_2_shortwav('VideoProcess/video_item2.json', '/home/derc/sunbo/shortwav')
-speech_recognition_baidu('VideoProcess/video_item_keyframe.json', '/home/derc/sunbo/shortwav')
+speech_recognition_baidu('VideoProcess/video_item_keyframe.json', 'VideoProcess/video_item_keyframe_backup.json',
+                         '/home/derc/sunbo/shortwav')
 
 print('done')
