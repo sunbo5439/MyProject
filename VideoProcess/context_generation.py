@@ -38,7 +38,7 @@ def gen_sum(path_desc_voice_file,video_items_path_new):
         voice_text=d['voice_text']
         summary_voice=sg.get_summary(voice_text)
         d['summay_voice']=summary_voice
-    json.dump(codecs.open(video_items_path_new, 'w', 'utf-8'), ensure_ascii=False, indent=4)
+    json.dump(path_desc_voice_list,codecs.open(video_items_path_new, 'w', 'utf-8'), ensure_ascii=False, indent=4)
 
 
 def wav2text(wav_file, language='zh'):
