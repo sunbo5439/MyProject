@@ -21,7 +21,7 @@ class Summary_Gen(object):
     def __init__(self):
         self._tr4s = TextRank4Sentence()
 
-    def get_summary(self, text, num_sum=10):
+    def get_summary(self, text, num_sum=30):
         self._tr4s.analyze(text=text, lower=True, source='all_filters')
         rs_list = []
         for item in self._tr4s.get_key_sentences(num=3):
@@ -31,15 +31,14 @@ class Summary_Gen(object):
 
 
 
-def gen_sum():
+def gen_sum(path_desc_voice_file,video_items_path_new):
     sg = Summary_Gen()
-    path_desc_voice_file = 'path_desc_voice.json'
     path_desc_voice_list = json.load(codecs.open(path_desc_voice_file, 'r', 'utf-8'))
     for d in path_desc_voice_list:
         voice_text=d['voice_text']
         summary_voice=sg.get_summary(voice_text)
         d['summay_voice']=summary_voice
-    json.dump(codecs.open(path_desc_voice_file, 'w', 'utf-8'), ensure_ascii=False, indent=4)
+    json.dump(codecs.open(video_items_path_new, 'w', 'utf-8'), ensure_ascii=False, indent=4)
 
 
 def wav2text(wav_file, language='zh'):
@@ -85,3 +84,7 @@ def wav2text(wav_file, language='zh'):
     else:
         print ("错误")
     return word
+
+video_items_path = 'VideoProcess/video_item_keyframe.json'
+video_items_path_new = 'VideoProcess/video_item_keyframe.json'
+gen_sum(video_items_path,video_items_path_new)
