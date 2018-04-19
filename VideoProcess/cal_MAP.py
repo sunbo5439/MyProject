@@ -25,6 +25,7 @@ def cal_AR(key_list, doc_list, types=['voice_text']):
         total_count += cur_total_count
         hit_count += cur_hit_count
     ar = hit_count * 1.0 / total_count
+    return ar
 
 
 def averageP(key, doc_list, types=['voice_text']):
@@ -48,6 +49,7 @@ def cal_AP(key_list, doc_list, types=['voice_text']):
         total_count += cur_total_count
         hit_count += cur_hit_count
     ap = hit_count * 1.0 / total_count
+    return ap
 
 
 def cal_Fscore(p, r):
