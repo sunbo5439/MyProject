@@ -85,6 +85,6 @@ def wav2text(wav_file, language='zh'):
         print ("错误")
     return word
 
-video_items_path = 'VideoProcess/video_item_keyframe.json'
-video_items_path_new = 'VideoProcess/video_item_keyframe.json'
+video_items_path = 'video_item_keyframe.json'
+video_items_path_new = 'video_item_keyframe_new.json'
 gen_sum(video_items_path,video_items_path_new)
