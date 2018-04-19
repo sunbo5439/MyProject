@@ -54,11 +54,11 @@ def cal_Fscore(p, r):
     return 2 * p * r / (p + r)
 
 
-f = codecs.open('/Users/sunbo/Desktop/a.txt', 'r', 'utf-8')
+f = codecs.open('keys.txt', 'r', 'utf-8')
 line = f.readline()
 keys = line.split()
 print('length of keys' + str(len(keys)))
-video_items_path = '/Users/sunbo/Desktop/video_item_keyframe.json'
+video_items_path = 'video_item_keyframe.json'
 video_items = json.load(codecs.open(video_items_path, 'r', 'utf-8'))
 
 print('语音')
@@ -100,3 +100,5 @@ f = cal_Fscore(ap, ar)
 print('ar:' + str(ar))
 print('ap:' + str(ap))
 print('f :' + str(ar))
+
+print('done')
